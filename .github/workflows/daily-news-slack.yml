@@ -4,8 +4,7 @@ on:
   schedule:
     # 毎朝 7:00 (日本時間) に実行。
     # 2026年3月からGitHub Actionsはタイムゾーン指定に対応したのでJSTで直接書けます。
-    - cron: '0 7 * * *'
-      timezone: 'Asia/Tokyo'
+     - cron: '0 22 * * *'
   # 手動実行も可能にしておく（テスト用。ActionsタブのRun workflowから動かせる）
   workflow_dispatch:
 
