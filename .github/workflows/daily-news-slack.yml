@@ -2,11 +2,15 @@ name: Daily AI News to Slack
 
 on:
   schedule:
-    # 毎朝 7:00 (日本時間) に実行。
+    # 毎朝 7:07 (日本時間) に実行。
     # 2026年3月からGitHub Actionsはタイムゾーン指定に対応したのでJSTで直接書けます。
-     - cron: '0 22 * * *'
+    - cron: '7 7 * * *'
+      timezone: 'Asia/Tokyo'
   # 手動実行も可能にしておく（テスト用。ActionsタブのRun workflowから動かせる）
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   send-news:
@@ -28,3 +32,15 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python main_slack.py
+
+      - name: 送信済みURLリストをコミット
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sent.json
+          if git diff --cached --quiet; then
+            echo "sent.json に差分がないためコミットをスキップします"
+          else
+            git commit -m "Update sent news URLs"
+            git push
+          fi
