@@ -306,6 +306,8 @@ def send_to_slack(summary, webhook_url, today, article_id_to_url=None):
         # blocksが表示できない環境向けのフォールバックテキスト
         "text": f"🤖 今日のAIニュース ({today})",
         "blocks": blocks,
+        "unfurl_links": False,
+        "unfurl_media": False,
     }
 
     res = requests.post(webhook_url, json=payload, timeout=30)
@@ -317,7 +319,11 @@ def send_to_slack(summary, webhook_url, today, article_id_to_url=None):
 
 def send_plain_message_to_slack(message, webhook_url):
     """致命的な失敗時などに、Slackへ1行通知を送る。"""
-    payload = {"text": message}
+    payload = {
+        "text": message,
+        "unfurl_links": False,
+        "unfurl_media": False,
+    }
     res = requests.post(webhook_url, json=payload, timeout=30)
     if res.status_code != 200 or res.text != "ok":
         raise RuntimeError(f"Slack 送信エラー {res.status_code}: {res.text[:500]}")
