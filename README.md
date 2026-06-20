@@ -4,7 +4,8 @@
 
 > RSS収集 → 重複除外 → Gemini要約 → Slack整形 → 送信 → 送信済み記録、までを 1日1回・全自動・無料で回しています。
 
-![Slackに届いたニュースまとめ](docs/screenshot.png)
+<img width="721" height="1568" alt="image" src="https://github.com/user-attachments/assets/d3b02ab2-10f6-41f1-89ef-d9e0af40603c" />
+
 
 ---
 
