@@ -29,6 +29,7 @@ jobs:
 
       - name: AIニュース要約をSlackに送信
         env:
+          TZ: 'Asia/Tokyo'
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python main_slack.py

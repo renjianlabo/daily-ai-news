@@ -47,6 +47,11 @@ GEMINI_MODEL = "gemini-2.5-flash"
 SENT_FILE = "sent.json"
 MAX_SENT_URLS = 300
 RETRY_DELAYS = (2, 4, 8)
+JST = datetime.timezone(datetime.timedelta(hours=9), "Asia/Tokyo")
+
+
+def today_jst():
+    return datetime.datetime.now(JST).date()
 
 
 # ---- 送信済みURL --------------------------------------------------------
@@ -170,7 +175,7 @@ def summarize_with_gemini(news_text, api_key):
         f"https://generativelanguage.googleapis.com/v1beta/"
         f"models/{GEMINI_MODEL}:generateContent"
     )
-    today = datetime.date.today().strftime("%Y年%m月%d日")
+    today = today_jst().strftime("%Y年%m月%d日")
     prompt = (
         f"あなたは、AIに詳しくない初心者に向けて記事を書く新聞記者です。\n"
         f"以下は{today}に各メディア（海外・日本）が報じたAI関連ニュースの見出しと概要の一覧です。\n"
@@ -345,7 +350,7 @@ def main():
         print(f"[error] 環境変数が未設定です: {', '.join(missing)}", file=sys.stderr)
         sys.exit(1)
 
-    today = datetime.date.today().strftime("%Y/%m/%d")
+    today = today_jst().strftime("%Y/%m/%d")
     try:
         print("ニュースを取得中...")
         news_text, article_id_to_url, fallback_articles = collect_news()
