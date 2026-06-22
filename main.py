@@ -74,16 +74,19 @@ def main():
             articles = parse_articles(summary, article_id_to_url)
             if not articles:
                 raise RuntimeError("Gemini の要約から記事を解析できませんでした")
+            gemini_summary_succeeded = True
         except Exception as e:
             print(f"[warn] Gemini要約に失敗したためフォールバックを送信します: {e}", file=sys.stderr)
             articles = build_fallback_articles(fallback_candidates)
+            gemini_summary_succeeded = False
 
         print("通知先に送信中...")
         sent_count = send_articles_to_all(notifiers, articles, today)
         if sent_count == 0:
             raise RuntimeError("すべての通知先への送信に失敗しました")
 
-        record_sent_urls(article_urls(articles))
+        if gemini_summary_succeeded:
+            record_sent_urls(article_urls(articles))
         print("完了！")
     except Exception as e:
         message = f"⚠️ 本日のAIニュース生成に失敗しました: {str(e)[:300]}"
