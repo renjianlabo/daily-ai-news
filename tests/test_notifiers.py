@@ -42,7 +42,24 @@ class NotifierFormattingTests(unittest.TestCase):
         self.assertTrue(chunks[0].startswith("🤖 今日のAIニュース (2026/06/23)"))
         joined = "\n".join(chunks)
         self.assertIn("**長いニュース**", joined)
-        self.assertIn("🔗 元記事を読む: https://example.com/a", joined)
+        self.assertIn("🔗 元記事を読む: <https://example.com/a>", joined)
+        self.assertNotIn("🔗 元記事を読む: https://example.com/a", joined)
+
+    def test_discord_chunks_wrap_all_urls_to_suppress_embeds_after_splitting(self):
+        articles = [
+            Article("長文記事", "あ" * 1990, "https://example.com/very-long-article"),
+            Article("次の記事", "本文", "https://example.com/second"),
+        ]
+
+        chunks = build_discord_chunks(articles, "2026/06/23", limit=2000)
+        joined = "\n".join(chunks)
+
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(all(len(chunk) <= 2000 for chunk in chunks))
+        self.assertIn("🔗 元記事を読む: <https://example.com/very-long-article>", joined)
+        self.assertIn("🔗 元記事を読む: <https://example.com/second>", joined)
+        self.assertNotIn("🔗 元記事を読む: https://example.com/very-long-article", joined)
+        self.assertNotIn("🔗 元記事を読む: https://example.com/second", joined)
 
     def test_line_chunks_use_plain_text_and_split_under_limit(self):
         articles = [

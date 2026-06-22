@@ -8,7 +8,7 @@ def format_discord_article(article):
     if article.body:
         lines.append(article.body)
     if article.url:
-        lines.append(f"🔗 元記事を読む: {article.url}")
+        lines.append(f"🔗 元記事を読む: <{article.url}>")
     return "\n".join(lines)
 
 
