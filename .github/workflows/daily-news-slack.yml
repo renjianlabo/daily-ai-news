@@ -30,9 +30,13 @@ jobs:
       - name: AIニュース要約をSlackに送信
         env:
           TZ: 'Asia/Tokyo'
+          NOTIFY_TARGETS: 'slack'
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: python main_slack.py
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          LINE_CHANNEL_TOKEN: ${{ secrets.LINE_CHANNEL_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python main.py
 
       - name: 送信済みURLリストをコミット
         run: |
