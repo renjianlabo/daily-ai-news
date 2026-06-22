@@ -30,7 +30,7 @@ jobs:
       - name: AIニュース要約をSlackに送信
         env:
           TZ: 'Asia/Tokyo'
-          NOTIFY_TARGETS: 'slack'
+          NOTIFY_TARGETS: 'slack,discord'
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
