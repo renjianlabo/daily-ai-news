@@ -281,7 +281,7 @@ def parse_articles(summary_text, article_id_to_url):
         body_lines = []
         url = None
         for line in lines[1:]:
-            match = re.match(r"^元記事ID:\s*(\d+)\s*$", line)
+            match = re.match(r"^\s*元記事ID\s*[:：]\s*(\d+)", line)
             if match:
                 url = article_id_to_url.get(int(match.group(1)))
                 break

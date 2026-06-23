@@ -33,6 +33,39 @@ Google DeepMindが新モデルを公開しました。
             ],
         )
 
+    def test_parse_articles_accepts_loose_article_id_lines(self):
+        cases = [
+            ("元記事ID: 3", 3),
+            ("元記事ID：3", 3),
+            ("元記事ID: 3（TechCrunch）", 3),
+            ("元記事ID:3", 3),
+        ]
+
+        for id_line, article_id in cases:
+            with self.subTest(id_line=id_line):
+                articles = parse_articles(
+                    f"""見出し
+本文です。
+{id_line}
+""",
+                    {article_id: f"https://example.com/{article_id}"},
+                )
+
+                self.assertEqual(articles[0].url, f"https://example.com/{article_id}")
+                self.assertEqual(articles[0].body, "本文です。")
+
+    def test_parse_articles_does_not_match_numbers_without_article_id_prefix(self):
+        articles = parse_articles(
+            """見出し
+本文に 3 という数字があります。
+ID: 3
+""",
+            {3: "https://example.com/3"},
+        )
+
+        self.assertIsNone(articles[0].url)
+        self.assertEqual(articles[0].body, "本文に 3 という数字があります。\nID: 3")
+
     def test_build_fallback_articles_returns_common_article_list(self):
         fallback_articles = [
             {"id": 1, "source": "TechCrunch AI", "title": "OpenAI releases tool", "url": "https://example.com/1"},
