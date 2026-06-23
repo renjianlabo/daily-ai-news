@@ -9,6 +9,10 @@ on:
   # 手動実行も可能にしておく（テスト用。ActionsタブのRun workflowから動かせる）
   workflow_dispatch:
 
+concurrency:
+  group: daily-news-slack
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
