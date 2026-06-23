@@ -7,9 +7,11 @@ import os
 import sys
 
 from core import (
+    already_sent_today,
     article_urls,
     build_fallback_articles,
     collect_news,
+    mark_sent_today,
     parse_articles,
     record_sent_urls,
     summarize_with_gemini,
@@ -48,6 +50,10 @@ def send_articles_to_all(notifiers, articles, today):
     return sent_count
 
 
+def is_schedule_event():
+    return os.environ.get("GITHUB_EVENT_NAME") == "schedule"
+
+
 def main():
     gemini_key = os.environ.get("GEMINI_API_KEY")
     if not gemini_key:
@@ -60,6 +66,10 @@ def main():
         sys.exit(1)
 
     today = today_jst().strftime("%Y/%m/%d")
+    if is_schedule_event() and already_sent_today(today):
+        print(f"[warn] {today} はすでに送信済みのためschedule実行をスキップします", file=sys.stderr)
+        return
+
     try:
         print("ニュースを取得中...")
         news_text, article_id_to_url, fallback_candidates = collect_news()
@@ -74,6 +84,8 @@ def main():
             articles = parse_articles(summary, article_id_to_url)
             if not articles:
                 raise RuntimeError("Gemini の要約から記事を解析できませんでした")
+            if len(article_urls(articles)) != len(articles):
+                raise RuntimeError("Gemini の要約から元記事URLを解決できない記事がありました")
             gemini_summary_succeeded = True
         except Exception as e:
             print(f"[warn] Gemini要約に失敗したためフォールバックを送信します: {e}", file=sys.stderr)
@@ -87,6 +99,8 @@ def main():
 
         if gemini_summary_succeeded:
             record_sent_urls(article_urls(articles))
+        if is_schedule_event():
+            mark_sent_today(today)
         print("完了！")
     except Exception as e:
         message = f"⚠️ 本日のAIニュース生成に失敗しました: {str(e)[:300]}"

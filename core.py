@@ -30,6 +30,7 @@ MAX_ITEMS_PER_FEED = 6
 TARGET_ARTICLE_COUNT = 5
 GEMINI_MODEL = "gemini-2.5-flash"
 SENT_FILE = "sent.json"
+RUN_STATE_FILE = "run_state.json"
 MAX_SENT_URLS = 300
 RETRY_DELAYS = (2, 4, 8)
 JST = datetime.timezone(datetime.timedelta(hours=9), "Asia/Tokyo")
@@ -79,6 +80,39 @@ def record_sent_urls(urls):
     if not urls:
         return
     save_sent_urls(load_sent_urls() + urls)
+
+
+def load_run_state():
+    """run_state.json から実行状態を読み込む。壊れていても空扱いで続行する。"""
+    try:
+        with open(RUN_STATE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        return {}
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"[warn] {RUN_STATE_FILE} の読み込みに失敗: {e}", file=sys.stderr)
+        return {}
+
+    if not isinstance(data, dict):
+        print(f"[warn] {RUN_STATE_FILE} がオブジェクトではないため空扱いにします", file=sys.stderr)
+        return {}
+    return data
+
+
+def save_run_state(state):
+    with open(RUN_STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+
+
+def already_sent_today(today):
+    return load_run_state().get("last_success_date") == today
+
+
+def mark_sent_today(today):
+    state = load_run_state()
+    state["last_success_date"] = today
+    save_run_state(state)
 
 
 # ---- RSS取得 ------------------------------------------------------------

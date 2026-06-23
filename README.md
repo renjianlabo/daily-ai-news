@@ -87,7 +87,8 @@ daily-ai-news/
 │   ├── discord.py                # Discord Webhook 通知
 │   └── line.py                   # LINE push / broadcast 通知
 ├── tests/                        # 標準 unittest のテスト
-├── sent.json                     # 送信済みURLの記録（重複排除の状態。自動更新される）
+├── sent.json                     # 要約成功時に送信済みURLを記録（重複排除の状態。自動更新される）
+├── run_state.json                # scheduleの同日二重送信を防ぐ実行状態（自動更新される）
 ├── requirements.txt              # 依存ライブラリ
 ├── README.md
 └── .github/workflows/
