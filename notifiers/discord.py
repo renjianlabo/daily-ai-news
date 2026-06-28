@@ -38,8 +38,11 @@ def split_text_units(units, limit, separator="\n\n"):
 
 def build_discord_chunks(articles, today, limit=2000):
     header = f"🤖 今日のAIニュース ({today})"
-    units = [header] + [format_discord_article(article) for article in articles]
-    return split_text_units(units, limit, separator="\n\n───\n\n")
+    divider = "───"
+    units = [header]
+    for article in articles:
+        units.append(f"{divider}\n\n{format_discord_article(article)}")
+    return split_text_units(units, limit, separator="\n\n")
 
 
 class DiscordNotifier:

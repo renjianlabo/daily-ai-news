@@ -61,6 +61,18 @@ class NotifierFormattingTests(unittest.TestCase):
         self.assertNotIn("🔗 元記事を読む: https://example.com/very-long-article", joined)
         self.assertNotIn("🔗 元記事を読む: https://example.com/second", joined)
 
+    def test_discord_split_article_chunk_starts_with_divider(self):
+        articles = [
+            Article("長文記事", "あ" * 1880, "https://example.com/long"),
+            Article("次の記事", "本文", "https://example.com/second"),
+        ]
+
+        chunks = build_discord_chunks(articles, "2026/06/23", limit=2000)
+
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(all(len(chunk) <= 2000 for chunk in chunks))
+        self.assertTrue(chunks[1].startswith("───"))
+
     def test_line_chunks_use_plain_text_and_split_under_limit(self):
         articles = [
             Article("長いニュース", "あ" * 4950, "https://example.com/a"),
